@@ -200,7 +200,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
             pinch: function () {
               return function (evt) {
                 //缓存当前DOM
-                console.info(currentImg);
+                console.info("进来了");
                 if (currentImg == null || currentIndex !== _this.currentIndex) {
                   [].map.call(document.querySelector("._img_magnifier_box").querySelectorAll("._img_magnifier_view"), function (element, index) {
                     if (index + 1 == _this.currentIndex) {
@@ -211,6 +211,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
                     }
                   });
                 }
+                console.info("进来了1");
                 console.info(currentImg);
                 console.info(curevt.zoomrentImg);
                 console.info(initScale);
