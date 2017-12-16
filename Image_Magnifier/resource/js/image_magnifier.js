@@ -16,6 +16,9 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
     require("resource/js/sentinel.min");
     require("resource/js/alloy_touch");
     require("resource/js/transform");
+    var VConsole = require('resource/js/vconsole.min');
+    var vConsole = new VConsole();
+    vConsole.show();
     w.requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || function (fun) {
       setTimeout(fun(), 1000 / 60);
     };
@@ -197,6 +200,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
             pinch: function () {
               return function (evt) {
                 //缓存当前DOM
+                console.info(currentImg);
                 if (currentImg == null || currentIndex !== _this.currentIndex) {
                   [].map.call(document.querySelector("._img_magnifier_box").querySelectorAll("._img_magnifier_view"), function (element, index) {
                     if (index + 1 == _this.currentIndex) {
@@ -207,6 +211,9 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
                     }
                   });
                 }
+                console.info(currentImg);
+                console.info(curevt.zoomrentImg);
+                console.info(initScale);
                 if (currentImg) {
                   currentImg.scaleX = currentImg.scaleY = initScale * evt.zoom;
                 }
@@ -266,7 +273,6 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
       }, {
         key: "refreshStyle",
         value: function refreshStyle() {
-          console.log(this.img_box);
           if (this.boxDOm == null || this.img_box.length < 1) return;
           this.boxDOm.style.width = window.innerWidth * this.img_box.length + "px";
         }
