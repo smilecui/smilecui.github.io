@@ -36,6 +36,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
         this.Auto_model = {}; //存放autoId对应的模型
         this.winWidth = window.innerWidth;
         this.currentIndex = 1; //当前第几个
+        this.currentImg; //当前image
         if (Object.prototype.toString.call(config) !== "[object Object]") {
           return;
         }
@@ -47,10 +48,10 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
         this.boxDOm = document.querySelector("._img_magnifier_box");
         var style = document.createElement("style");
         style.id = "_img_magnifier_style";
-        style.innerHTML = "._img_magnifier_wrapper{position:fixed;left:0;right:0;bottom:0;top:0;overflow:hidden;z-index:998;background-color:#000}._img_magnifier_spinner{width:60px;height:60px;position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);display:none}._img_magnifier_bounce1,._img_magnifier_bounce2{width:100%;height:100%;border-radius:50%;background-color:#67CF22;opacity:.6;position:absolute;top:0;left:0;-webkit-animation:bounce 2s infinite ease-in-out;animation:bounce 2s infinite ease-in-out}._img_magnifier_bounce2{-webkit-animation-delay:-1s;animation-delay:-1s}@-webkit-keyframes bounce{0%,100%{-webkit-transform:scale(0)}50%{-webkit-transform:scale(1)}}@keyframes bounce{0%,100%{transform:scale(0);-webkit-transform:scale(0)}50%{transform:scale(1);-webkit-transform:scale(1)}}._img_magnifier_box{font-size:0}._img_magnifier_box::after{content:\"\";clear:left}._img_magnifier_item{width:100vw;height:100vh;overflow:auto;-webkit-overflow-scrolling:touch;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;float:left}._img_magnifier_item img{max-width:100%!important}" + "._img_magnifier_item{width:" + window.innerWidth + "px}";
+        style.innerHTML = "._img_magnifier_wrapper{position:fixed;left:0;right:0;bottom:0;top:0;overflow:hidden;z-index:998;background-color:#000}._img_magnifier_spinner{width:60px;height:60px;position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);display:none}._img_magnifier_bounce1,._img_magnifier_bounce2{width:100%;height:100%;border-radius:50%;background-color:#67CF22;opacity:.6;position:absolute;top:0;left:0;-webkit-animation:bounce 2s infinite ease-in-out;animation:bounce 2s infinite ease-in-out}._img_magnifier_bounce2{-webkit-animation-delay:-1s;animation-delay:-1s}@-webkit-keyframes bounce{0%,100%{-webkit-transform:scale(0)}50%{-webkit-transform:scale(1)}}@keyframes bounce{0%,100%{transform:scale(0);-webkit-transform:scale(0)}50%{transform:scale(1);-webkit-transform:scale(1)}}._img_magnifier_box{font-size:0}._img_magnifier_box::after{content:\"\";clear:left}._img_magnifier_item{width:100vw;height:100vh;overflow:scroll;-webkit-overflow-scrolling:touch;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;float:left}._img_magnifier_item img{max-width:100%!important}" + "._img_magnifier_item{width:" + window.innerWidth + "px}";
         document.head.appendChild(style);
         (function() {
-      var cssContent = '._img_magnifier_wrapper{position:fixed;left:0;right:0;bottom:0;top:0;overflow:hidden;z-index:998;background-color:#000}._img_magnifier_spinner{width:60px;height:60px;position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);display:none}._img_magnifier_bounce1,._img_magnifier_bounce2{width:100%;height:100%;border-radius:50%;background-color:#67CF22;opacity:.6;position:absolute;top:0;left:0;-webkit-animation:bounce 2s infinite ease-in-out;animation:bounce 2s infinite ease-in-out}._img_magnifier_bounce2{-webkit-animation-delay:-1s;animation-delay:-1s}@-webkit-keyframes bounce{0%,100%{-webkit-transform:scale(0)}50%{-webkit-transform:scale(1)}}@keyframes bounce{0%,100%{transform:scale(0);-webkit-transform:scale(0)}50%{transform:scale(1);-webkit-transform:scale(1)}}._img_magnifier_box{font-size:0}._img_magnifier_box::after{content:"";clear:left}._img_magnifier_item{width:100vw;height:100vh;overflow:auto;-webkit-overflow-scrolling:touch;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;float:left}._img_magnifier_item img{max-width:100%!important}';
+      var cssContent = '._img_magnifier_wrapper{position:fixed;left:0;right:0;bottom:0;top:0;overflow:hidden;z-index:998;background-color:#000}._img_magnifier_spinner{width:60px;height:60px;position:absolute;top:50%;left:50%;-webkit-transform:translate(-50%,-50%);-ms-transform:translate(-50%,-50%);transform:translate(-50%,-50%);display:none}._img_magnifier_bounce1,._img_magnifier_bounce2{width:100%;height:100%;border-radius:50%;background-color:#67CF22;opacity:.6;position:absolute;top:0;left:0;-webkit-animation:bounce 2s infinite ease-in-out;animation:bounce 2s infinite ease-in-out}._img_magnifier_bounce2{-webkit-animation-delay:-1s;animation-delay:-1s}@-webkit-keyframes bounce{0%,100%{-webkit-transform:scale(0)}50%{-webkit-transform:scale(1)}}@keyframes bounce{0%,100%{transform:scale(0);-webkit-transform:scale(0)}50%{transform:scale(1);-webkit-transform:scale(1)}}._img_magnifier_box{font-size:0}._img_magnifier_box::after{content:"";clear:left}._img_magnifier_item{width:100vw;height:100vh;overflow:scroll;-webkit-overflow-scrolling:touch;display:-webkit-box;display:-webkit-flex;display:-ms-flexbox;display:flex;-webkit-box-align:center;-webkit-align-items:center;-ms-flex-align:center;align-items:center;float:left}._img_magnifier_item img{max-width:100%!important}';
       var injectCssFn = (function (css) {
       var headEl = document.getElementsByTagName('head')[0];
       var styleEl = document.createElement('style');
@@ -196,6 +197,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
           return {
             touch: box,
             touchEnd: function touchEnd() {
+              if (_this.currentImg && _this.currentImg.scaleX > 1) return;
               //最左侧
               if (currentTranslateX >= 100 || currentTranslateX >= 0 && currentTranslateX < 100) {
                 backLeft();
@@ -207,6 +209,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
               }
             },
             pressMove: function pressMove(evt) {
+              if (_this.currentImg && _this.currentImg.scaleX > 1) return;
               if (Math.abs(evt.deltaX) <= Math.abs(evt.deltaY)) return;
               //右滑动
               if (evt.deltaX > 0) {
@@ -232,23 +235,27 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
   
         var af = new AlloyFinger(this.boxDOm, function () {
           var initScale = 1,
-              currentImg,
               currentIndex;
           return {
+            multipointStart: function multipointStart() {
+              if (_this.currentImg) {
+                initScale = _this.currentImg.scaleX;
+              }
+            },
             pinch: function pinch(evt) {
               //缓存当前DOM                    
-              if (currentImg == null || currentIndex !== _this.currentIndex) {
+              if (_this.currentImg == null || currentIndex !== _this.currentIndex) {
                 [].map.call(document.querySelector("._img_magnifier_box").querySelectorAll("._img_magnifier_view"), function (element, index) {
                   if (index + 1 == _this.currentIndex) {
                     currentIndex = _this.currentIndex;
-                    currentImg = element;
-                    Transform(currentImg);
-                    initScale = currentImg.scaleX;
+                    _this.currentImg = element;
+                    Transform(_this.currentImg);
+                    initScale = _this.currentImg.scaleX;
                   }
                 });
               }
-              if (currentImg) {
-                currentImg.scaleX = currentImg.scaleY = initScale * evt.zoom;
+              if (_this.currentImg) {
+                _this.currentImg.scaleX = _this.currentImg.scaleY = initScale * evt.zoom;
               }
             }
           };
