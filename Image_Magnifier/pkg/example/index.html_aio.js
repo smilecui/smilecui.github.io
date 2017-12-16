@@ -54,6 +54,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
         this.img_box = [];
         this.Auto_model = {}; //存放autoId对应的模型
         this.winWidth = window.innerWidth;
+        this.currentIndex = 1; //当前第几个
         if (Object.prototype.toString.call(config) !== "[object Object]") {
           return;
         }
@@ -170,8 +171,11 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
             var timer,
                 timer1,
                 NumerDelay = 0;
+            var current = _this;
             function turnLeft() {
               if (NumerDelay <= 0.5) {
+                //计算当前页数
+                current.currentIndex = parseInt(Math.abs(currentTranslateX) / current.winWidth) + 1;
                 if (timer) {
                   cancelAnimationFrame(timer);
                 }
@@ -185,6 +189,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
             };
             function turnRight() {
               if (NumerDelay <= 0.5) {
+                current.currentIndex = parseInt(Math.abs(currentTranslateX) / current.winWidth) + 1;
                 if (timer1) {
                   cancelAnimationFrame(timer1);
                 }
@@ -197,7 +202,6 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
               timer1 = requestAnimationFrame(turnRight);
             };
             return function (page, over) {
-  
               //左翻页
               if (over >= _this.winWidth / 2) {
                 NumerDelay = _this.winWidth - over;
@@ -208,12 +212,34 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
               }
             };
           }();
+          var initScale = 1,
+              currentImg,
+              currentIndex;
           return {
             touch: box,
+            pinch: function () {
+              return function (evt) {
+                //缓存当前DOM
+                if (currentImg == null || currentIndex !== _this.currentIndex) {
+                  [].map.call(document.querySelector("._img_magnifier_box").querySelectorAll("._img_magnifier_view"), function (element, index) {
+                    if (index + 1 == _this.currentIndex) {
+                      currentIndex = _this.currentIndex;
+                      currentImg = element;
+                      Transform(currentImg);
+                      initScale = currentImg.scaleX;
+                    }
+                  });
+                }
+                if (currentImg) {
+                  currentImg.scaleX = currentImg.scaleY = initScale * evt.zoom;
+                }
+              };
+            }(),
             touchEnd: function touchEnd() {
               //最左侧
               if (currentTranslateX >= 100 || currentTranslateX >= 0 && currentTranslateX < 100) {
                 backLeft();
+                _this.currentIndex = 1;
               } else {
                 var over = Math.abs(currentTranslateX) % _this.winWidth;
                 var count = parseInt(Math.abs(currentTranslateX) / _this.winWidth);
