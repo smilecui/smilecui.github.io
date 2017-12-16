@@ -14,7 +14,12 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
   
   !function (w, d) {
     require("resource/js/sentinel.min");
-    require("resource/js/alloy-finger");
+    require("resource/js/alloy_touch");
+    require("resource/js/transform");
+    w.requestAnimationFrame = w.requestAnimationFrame || w.webkitRequestAnimationFrame || function (fun) {
+      setTimeout(fun(), 1000 / 60);
+    };
+    w.cancelAnimationFrame = w.cancelAnimationFrame || w.webkitCancelAnimationFrame || w.clearTimeout;
   
     var Magnifier = function () {
       function Magnifier(config) {
@@ -25,7 +30,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
         this.AutoIdArr = []; //存放随机码
         this.img_box = [];
         this.Auto_model = {}; //存放autoId对应的模型
-  
+        this.winWidth = window.innerWidth;
         if (Object.prototype.toString.call(config) !== "[object Object]") {
           return;
         }
@@ -119,14 +124,94 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
           }, 100);
         });
         //绑定滑动事件
-        new AlloyFinger(document.querySelector("._img_magnifier_wrapper"), function () {
-          var deltaX = 0;
+        this.touch = new AlloyTouch(function () {
+          var box = _this.boxDOm;
+          Transform(box);
+          var currentTranslateX = 0;
+          var leftBack_timer;
+          //最左侧回退
+          function backLeft() {
+            if (currentTranslateX <= 0.5) {
+              if (leftBack_timer) {
+                cancelAnimationFrame(leftBack_timer);
+              }
+              return;
+            } else {
+              box.translateX -= currentTranslateX / 2;
+              currentTranslateX = box.translateX;
+            }
+            leftBack_timer = requestAnimationFrame(backLeft);
+          }
+          //翻页
+          var turnItem = function () {
+            var timer,
+                timer1,
+                NumerDelay = 0;
+            function turnLeft() {
+              if (NumerDelay <= 0.5) {
+                if (timer) {
+                  cancelAnimationFrame(timer);
+                }
+                return;
+              } else {
+                box.translateX -= NumerDelay / 2;
+                NumerDelay -= NumerDelay / 2;
+              }
+              timer = requestAnimationFrame(turnLeft);
+            };
+            function turnRight() {
+              if (NumerDelay <= 0.5) {
+                if (timer1) {
+                  cancelAnimationFrame(timer1);
+                }
+                return;
+              } else {
+                box.translateX += NumerDelay / 2;
+                NumerDelay -= NumerDelay / 2;
+              }
+              timer1 = requestAnimationFrame(turnRight);
+            };
+            return function (page, over) {
+              //左翻页
+              if (over >= _this.winWidth / 2) {
+                NumerDelay = _this.winWidth - over;
+                turnLeft();
+              } else {
+                NumerDelay = over;
+                turnRight();
+              }
+            };
+          }();
           return {
-            multipointEnd: function multipointEnd() {},
+            touch: box,
+            touchEnd: function touchEnd() {
+              //最左侧
+              if (currentTranslateX >= 100 || currentTranslateX >= 0 && currentTranslateX < 100) {
+                backLeft();
+              } else {
+                var over = Math.abs(currentTranslateX) % _this.winWidth;
+                var count = parseInt(Math.abs(currentTranslateX) / _this.winWidth);
+                turnItem(count, over);
+              }
+            },
             pressMove: function pressMove(evt) {
-              //evt.deltaX和evt.deltaY代表在屏幕上移动的距离
-              deltaX = evt.deltaX;
-              _this.imgWraperSwip(deltaX);
+              if (Math.abs(evt.deltaX) <= Math.abs(evt.deltaY)) return;
+              //右滑动
+              if (evt.deltaX > 0) {
+                //判断是否是最左侧了,最多150
+                if (currentTranslateX >= 100) {
+                  return;
+                }
+                //左滑动
+              } else if (evt.deltaX < 0) {
+  
+                //是否是最右侧
+                if (Math.abs(currentTranslateX) > _this.winWidth * _this.img_box.length - (_this.winWidth - 100)) {
+                  return;
+                }
+              }
+              box.translateX += evt.deltaX;
+              currentTranslateX = box.translateX;
             }
           };
         }());
