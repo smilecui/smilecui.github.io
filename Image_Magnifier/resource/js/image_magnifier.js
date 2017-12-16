@@ -16,6 +16,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
     require("resource/js/sentinel.min");
     require("resource/js/alloy_touch");
     require("resource/js/transform");
+    require("resource/js/alloy-crop");
     var VConsole = require('resource/js/vconsole.min');
     var vConsole = new VConsole();
     vConsole.show();
@@ -192,34 +193,8 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
               }
             };
           }();
-          var initScale = 1,
-              currentImg,
-              currentIndex;
           return {
             touch: box,
-            pinch: function () {
-              return function (evt) {
-                //缓存当前DOM
-                console.info("进来了");
-                if (currentImg == null || currentIndex !== _this.currentIndex) {
-                  [].map.call(document.querySelector("._img_magnifier_box").querySelectorAll("._img_magnifier_view"), function (element, index) {
-                    if (index + 1 == _this.currentIndex) {
-                      currentIndex = _this.currentIndex;
-                      currentImg = element;
-                      Transform(currentImg);
-                      initScale = currentImg.scaleX;
-                    }
-                  });
-                }
-                console.info("进来了1");
-                console.info(currentImg);
-                console.info(curevt.zoomrentImg);
-                console.info(initScale);
-                if (currentImg) {
-                  currentImg.scaleX = currentImg.scaleY = initScale * evt.zoom;
-                }
-              };
-            }(),
             touchEnd: function touchEnd() {
               //最左侧
               if (currentTranslateX >= 100 || currentTranslateX >= 0 && currentTranslateX < 100) {
@@ -250,6 +225,36 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
   
               box.translateX += evt.deltaX;
               currentTranslateX = box.translateX;
+            }
+          };
+        }());
+        //注册手势事件
+  
+        var af = new AlloyFinger(this.boxDOm, function () {
+          var initScale = 1,
+              currentImg,
+              currentIndex;
+          return {
+            pinch: function pinch(evt) {
+              //缓存当前DOM
+              console.info("进来了");
+              if (currentImg == null || currentIndex !== _this.currentIndex) {
+                [].map.call(document.querySelector("._img_magnifier_box").querySelectorAll("._img_magnifier_view"), function (element, index) {
+                  if (index + 1 == _this.currentIndex) {
+                    currentIndex = _this.currentIndex;
+                    currentImg = element;
+                    Transform(currentImg);
+                    initScale = currentImg.scaleX;
+                  }
+                });
+              }
+              console.info("进来了1");
+              console.info(currentImg);
+              console.info(curevt.zoomrentImg);
+              console.info(initScale);
+              if (currentImg) {
+                currentImg.scaleX = currentImg.scaleY = initScale * evt.zoom;
+              }
             }
           };
         }());
