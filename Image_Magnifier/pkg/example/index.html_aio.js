@@ -178,6 +178,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
                 return;
               } else {
                 box.translateX -= NumerDelay / 2;
+                currentTranslateX = box.transformX;
                 NumerDelay -= NumerDelay / 2;
               }
               timer = requestAnimationFrame(turnLeft);
@@ -190,11 +191,13 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
                 return;
               } else {
                 box.translateX += NumerDelay / 2;
+                currentTranslateX = box.transformX;
                 NumerDelay -= NumerDelay / 2;
               }
               timer1 = requestAnimationFrame(turnRight);
             };
             return function (page, over) {
+  
               //左翻页
               if (over >= _this.winWidth / 2) {
                 NumerDelay = _this.winWidth - over;
@@ -233,6 +236,7 @@ define('resource/js/image_magnifier.es6', function(require, exports, module) {
                   return;
                 }
               }
+  
               box.translateX += evt.deltaX;
               currentTranslateX = box.translateX;
             }
