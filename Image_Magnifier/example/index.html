@@ -12,13 +12,23 @@
 <body>  
     <div class="page">
         14日，在北京发布的一份调研报告显示，目前本科以上学历的职场人士普遍期望万元以上月薪酬，还有近半的求职人平均薪酬期望达到15000元/月
-        <img src="../resource/img/img2.jpg" class="Monent" alt="">
+        <img src="../resource/img/img2.jpg" class="Monent" data-src="/resource/img/img4.jpg" alt="">
         14日，在北京发布的一份调研报告显示，目前本科以上学历的职场人士普遍期望万元以上月薪酬，还有近半的求职人平均薪酬期望达到15000元/月
         <div class="insert" data-name="123"></div>
-        <img src="../resource/img/img3.jpg" class="Monent" alt="">
+        <img src="../resource/img/img2.jpg" class="Monent" data-src="../resource/img/img2.jpg" alt="">
+        <img src="../resource/img/img3.jpg" class="Monent" data-src="../resource/img/img3.jpg" alt="">
     </div>
 
-<script src="../resource/js/Magnifier_a5c3ccf.js"></script>
-<script>setTimeout(function(){var e=document.createElement("img");e.src="/resource/img/img2.jpg",e.className="Monent",document.querySelector(".insert").appendChild(e)},2e3),console.log(document.querySelector(".insert[data-name='123']"));</script>
+<script src="../resource/js/Magnifier_ae47665.js"></script>
+<script>
+       setTimeout(function(){
+            var img=document.createElement("img");
+            img.src="../resource/img/img2.jpg";
+            img.className="Monent";
+            document.querySelector(".insert").appendChild(img);
+       },2000);
+
+       console.log(document.querySelector(".insert[data-name='123']"));
+   </script>
 </body>
 </html>
